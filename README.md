@@ -71,25 +71,84 @@ npm install
 npm run dev        # http://localhost:3000 → /login
 npm test           # 44 tests: 17 spike (node) + 27 UI (jsdom)
 npm run lint && npm run typecheck && npm run build
+
+# Phase 1.1 browser harnesses (target = production build, terminal 1):
+npm run start -- -p 3111   # terminal 1
+npm run verify:ui          # terminal 2 — responsive/keyboard/leak matrix
+npm run verify:a11y        # axe-core scans, both color schemes
 ```
+
+### Phase 1.1 — verification pass (checkpoint after Phase 1)
+
+Verification-only pass over the Phase 1 tree (`adee1d8`); no Phase 2 work, no
+Supabase, no production auth or cryptography, crypto library unchanged. Two
+Playwright harnesses drive the **production build** using the already-pinned
+`playwright-core`; `axe-core` was added as a dev dependency and is injected
+from `node_modules` (no CDN, no other new dependency).
+
+- `scripts/verify-ui.mjs` renders real viewports — 375×812, 390×844,
+  768×1024 (≥768 → sidebar layout by design, breakpoint is 767px), and
+  1440×900 — in Chromium, plus Firefox/WebKit smoke at 375 and 1440, in both
+  color schemes (`UI_COLOR_SCHEME=dark|light`, default dark). It asserts
+  nav-mode switching (sidebar ↔ header + bottom tabs), composer/messages/
+  dialogs/pairing screens fit the viewport, zero horizontal overflow on every
+  screen, hit-testing that nothing covers the composer, send button, header,
+  or tab bar, visible keyboard focus, dialog focus trap + ESC + focus
+  restoration, and real-browser leak audits: all requests same-origin, no
+  typed password or message in any URL/body, storage keys namespaced
+  `messenger.ui.*` only, no console errors. **Result: 192/192 checks per
+  color scheme.**
+- `scripts/verify-a11y.mjs` scans login, chat (+ open demo menu), devices
+  (+ open pairing dialog), security, recovery, and settings at 1440×900 and
+  375×812, in **both** dark and light themes (theme-init follows
+  `prefers-color-scheme` on first visit, so both matter). Transient states
+  get a 300 ms settle so axe does not sample mid-animation. **Result:
+  24/24 scans clean, 0 violations.**
+
+Fixes made in this checkpoint (straightforward, no redesign):
+
+- **Contrast (axe `color-contrast` failures):** dark `--text-muted`
+  lightened; light `--text-muted`, `--accent`, `--accent-strong`, `--warn`,
+  `--danger`, `--success` and their soft/border rgba tints darkened — every
+  text and avatar pair now clears 4.5:1 on its real backdrop (values derived
+  with a WCAG luminance calculator, verified by the axe runs above).
+- **Landmarks/headings:** login root `<div>` → `<main>` (the page had no
+  main landmark and used content outside landmarks); chat partner name
+  `<span>` → `<h1>` (the chat screen had no level-one heading; an explicit
+  `font-size` keeps the layout identical).
+- **Keyboard scrolling:** the scrollable message list (`role="log"`) got
+  `tabIndex={0}` so it is reachable and scrollable by keyboard.
+
+Files changed: `app/globals.css` (tokens), `components/auth/LoginScreen.tsx`,
+`components/chat/ChatHeader.tsx` + `chat.module.css`, 
+`components/chat/MessageList.tsx`, `package.json` (+lock: `axe-core` dev dep,
+two scripts), and the two new harness files.
+
+Harness notes: Playwright WebKit's `fill()` does not reach React's controlled
+input state in this setup (real typing does), so `verify-ui` signs in with
+real keystrokes across all engines. **Safari-the-app remains unverified** —
+Playwright WebKit smoke is not a substitute for the Safari app (BLOCKERS.md).
 
 ### Known Phase 1 limitations
 
-- Responsive behavior is CSS-driven; automated tests assert landmarks and
-  interactions, not media-query rendering (no visual-regression suite yet).
+- Responsive behavior is functionally verified by the Phase 1.1 real-viewport
+  harness in both themes; there is still no pixel-diff visual-regression
+  suite, so purely cosmetic drift could go unnoticed.
 - The mock typing indicator ignores the privacy toggle by design (disclosed
   in the UI) — wiring preference-aware behavior needs a real messaging layer.
-- Safari was engine-tested only during Phase 0.5; the Phase 1 UI has not been
-  manually verified in the Safari app (see BLOCKERS.md).
-- No visual-regression or axe accessibility scan in this phase; accessibility
-  is via semantic markup, roles, labels, focus management, and keyboard paths.
+- Safari was engine-tested only during Phase 0.5; the Phase 1 UI has Playwright
+  WebKit smoke coverage (Phase 1.1) but the Safari app itself has not been
+  manually verified (see BLOCKERS.md).
+- Accessibility is axe-scanned clean in both themes (Phase 1.1) and backed by
+  semantic markup, roles, labels, focus management, and keyboard paths — but
+  no manual screen-reader pass has been performed.
 
 ### Phase 1 file changes (summary)
 
 New: `lib/mock/*`, `lib/ui/*`, `components/**`, `app/{login,chat,devices,security,recovery,settings}/`, `tests/setup.ts`, `tests/ui/*`, `public/theme-init.js`.
 Modified: `app/layout.tsx` (providers, theme script, metadata), `app/globals.css` (design tokens), `vitest.config.ts` (jsdom UI tests), `package.json` (pinned dev deps: jsdom, Testing Library).
 Removed: scaffold boilerplate (`app/page.tsx` starter, `app/page.module.css`, unused `public/*.svg`).
-Untouched: `lib/spike/`, `app/spike/`, `tests/spike.test.ts`, `tests/vectors/`, `scripts/`, and the pinned crypto dependency.
+Untouched: `lib/spike/`, `app/spike/`, `tests/spike.test.ts`, `tests/vectors/`, the existing `scripts/verify-browser.mjs` and `scripts/copy-wasm.mjs`, and the pinned crypto dependency (Phase 1.1 only added `scripts/verify-ui.mjs` and `scripts/verify-a11y.mjs`).
 
 ---
 

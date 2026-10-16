@@ -117,3 +117,14 @@ All "NOT proven" items above stand unchanged. In particular: the spike's key
 storage is still not production-acceptable, no server exists, metadata
 minimization is unaddressed, and no UI element in Phase 1 encrypts,
 transmits, uploads, verifies, or recovers anything.
+
+## Phase 1.1 addendum — real-browser re-check
+
+The Phase 1.1 verification pass re-observed the no-network/no-secret claims
+in a real production browser session (`scripts/verify-ui.mjs`): across both
+color schemes at four viewport sizes in Chromium (plus Firefox/WebKit smoke
+runs), every observed request was same-origin, no URL or request body
+contained the typed password or message text, and localStorage held only the
+two `messenger.ui.*` keys — no credentials, no message content, no console
+errors. This is the same claims under real rendering; it adds no new
+security property, and all "NOT proven" items above still stand.

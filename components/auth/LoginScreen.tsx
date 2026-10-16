@@ -63,7 +63,7 @@ export function LoginScreen() {
   };
 
   return (
-    <div className={styles.wrap}>
+    <main className={styles.wrap}>
       <div className={styles.card}>
         <div>
           <div className={styles.brandRow}>
@@ -127,6 +127,6 @@ export function LoginScreen() {
           Nothing is stored or sent anywhere.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

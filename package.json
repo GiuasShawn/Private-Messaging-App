@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "verify:browser": "node scripts/verify-browser.mjs",
+    "verify:ui": "node scripts/verify-ui.mjs",
+    "verify:a11y": "node scripts/verify-a11y.mjs",
     "postinstall": "node scripts/copy-wasm.mjs"
   },
   "dependencies": {
@@ -25,6 +27,7 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-core": "4.14.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "fake-indexeddb": "6.2.6",

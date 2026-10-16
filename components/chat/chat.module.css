@@ -28,6 +28,7 @@
 }
 
 .partnerName {
+  font-size: var(--text-base);
   font-weight: 620;
   overflow: hidden;
   text-overflow: ellipsis;

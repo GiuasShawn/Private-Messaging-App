@@ -94,7 +94,13 @@ export function MessageList({
   }
 
   return (
-    <div className={styles.list} role="log" aria-label="Messages" aria-live="polite">
+    <div
+      className={styles.list}
+      role="log"
+      aria-label="Messages"
+      aria-live="polite"
+      tabIndex={0}
+    >
       {messages.map((message, index) => {
         const previous = index > 0 ? messages[index - 1] : undefined;
         const showSeparator = !previous || !isSameDay(previous.sentAt, message.sentAt);

@@ -64,7 +64,7 @@ export function ChatHeader({
         label={partner.displayName}
       />
       <div className={styles.headerText}>
-        <span className={styles.partnerName}>{partner.displayName}</span>
+        <h1 className={styles.partnerName}>{partner.displayName}</h1>
         <span
           className={
             presence === "typing"
