@@ -1,35 +1,122 @@
+/* ==========================================================================
+   Haven — design tokens & base styles (Phase 1 UI prototype)
+
+   Dark is the default theme. Light is applied by setting data-theme="light"
+   on <html> (bootstrapped by /theme-init.js before hydration, persisted in
+   localStorage under messenger.ui.theme — a harmless UI preference).
+   ========================================================================== */
+
+/* Dark theme — the default token set. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --bg-base: #0b0e12;
+  --bg-surface: #11151c;
+  --bg-raised: #171d26;
+  --bg-hover: #1d2430;
+  --bg-inset: #0e1218;
+  --bg-overlay: rgba(3, 6, 10, 0.66);
+
+  --border-subtle: #222a35;
+  --border-strong: #313b4a;
+
+  --text-primary: #e9eef5;
+  --text-secondary: #9da8b8;
+  --text-muted: #6b7684;
+  --text-invert: #06231d;
+
+  --accent: #58d6bc;
+  --accent-strong: #74e2cd;
+  --accent-soft: rgba(88, 214, 188, 0.13);
+  --accent-border: rgba(88, 214, 188, 0.35);
+
+  --danger: #f2707e;
+  --danger-soft: rgba(242, 112, 126, 0.12);
+  --warn: #e5b45c;
+  --warn-soft: rgba(229, 180, 92, 0.12);
+  --success: #6fd08c;
+  --success-soft: rgba(111, 208, 140, 0.12);
+
+  --bubble-sent: rgba(88, 214, 188, 0.14);
+  --bubble-sent-border: rgba(88, 214, 188, 0.22);
+  --bubble-received: #1a212b;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14.5px;
+  --text-lg: 17px;
+  --text-xl: 21px;
+  --text-2xl: 26px;
+
+  --transition: 160ms ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Light theme overrides. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-base: #f4f6f9;
+  --bg-surface: #ffffff;
+  --bg-raised: #ffffff;
+  --bg-hover: #eef2f7;
+  --bg-inset: #f0f3f7;
+  --bg-overlay: rgba(24, 30, 40, 0.42);
+
+  --border-subtle: #e3e8ef;
+  --border-strong: #cdd5e0;
+
+  --text-primary: #131a24;
+  --text-secondary: #556173;
+  --text-muted: #8792a3;
+  --text-invert: #ffffff;
+
+  --accent: #0d9277;
+  --accent-strong: #0a7d66;
+  --accent-soft: rgba(13, 146, 119, 0.1);
+  --accent-border: rgba(13, 146, 119, 0.32);
+
+  --danger: #cf3b4c;
+  --danger-soft: rgba(207, 59, 76, 0.1);
+  --warn: #a8710f;
+  --warn-soft: rgba(168, 113, 15, 0.1);
+  --success: #24944f;
+  --success-soft: rgba(36, 148, 79, 0.1);
+
+  --bubble-sent: rgba(13, 146, 119, 0.12);
+  --bubble-sent-border: rgba(13, 146, 119, 0.2);
+  --bubble-received: #eef1f6;
+
+  --shadow-sm: 0 1px 2px rgba(19, 26, 36, 0.08);
+  --shadow-md: 0 8px 24px rgba(19, 26, 36, 0.1);
+  --shadow-lg: 0 24px 64px rgba(19, 26, 36, 0.16);
 }
 
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
 
 * {
   box-sizing: border-box;
@@ -37,13 +124,89 @@ body {
   margin: 0;
 }
 
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Consistent, visible focus for keyboard users across the app. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Subtle scrollbars that match the theme. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
+}
+
+/* Screen-reader-only utility (used for labels and live regions). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
