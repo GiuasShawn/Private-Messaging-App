@@ -1,4 +1,99 @@
-# Phase 0.5 — Browser-Cryptography Feasibility Spike
+# Haven — Private Two-Person Messenger
+
+A private, two-person, end-to-end-encrypted messenger (Next.js +
+TypeScript). Development proceeds in phases; this repository currently
+contains:
+
+- **Phase 0.5 — cryptographic feasibility spike:** complete and verified in
+  three browser engines (see the appendix below, plus
+  [SECURITY-NOTE.md](./SECURITY-NOTE.md)).
+- **Phase 1 — interface prototype (current):** a polished, responsive,
+  dark-first UI for every screen, built entirely on **mock data and local
+  state**. No backend, no real accounts, no integrated cryptography.
+
+> **Phase 1 honesty note:** nothing in the UI encrypts, transmits, uploads,
+> verifies, or recovers anything. Authentication is mock, attachments never
+> leave the device, and recovery generates no secret. Each screen says so
+> inline, and `tests/ui/leak-guard.test.tsx` asserts a full interaction pass
+> makes **zero network calls** and stores **no secrets**.
+
+## Phase 1 — interface prototype
+
+### Screens
+
+| Route | Screen | Notes |
+|---|---|---|
+| `/login` | Sign-in | Email + password, visibility toggle, validation; any email + 8+ char password is accepted (disclosed inline) |
+| `/chat` | Main chat | Header/presence, date-separated history, composer (Enter sends, Shift+Enter newline, IME-safe), simulated sending→sent→delivered→read receipts, mock typing indicator + canned replies, loading/error/empty states via a demo menu |
+| — | Attachments | Picker for images/files, size (25 MB) + type validation, simulated upload progress, local `blob:` previews; clearly labelled simulated |
+| `/devices` | Device management | Pending/approved/revoked states, mock approve + revoke (with confirm), pairing dialog with a placeholder code, honest verification labels ("Verified (simulated)") |
+| `/security` | Security settings | Encryption/verification/recovery/session panels; copy separates what the spike proved from what is wired |
+| `/recovery` | Recovery | Button-driven simulated setup + restore flows; generates/stores no secret; explains secret ≠ password and the loss consequences |
+| `/settings` | General settings | Theme (dark/light), profile display name + avatar preview, notification and privacy preferences |
+
+### Architecture
+
+```
+app/            routes (login, chat, devices, security, recovery, settings, spike)
+components/
+  ui/           primitives: buttons, fields, password toggle, switch, select,
+                avatar, badges, panels, accessible dialog, tooltip, icons
+  shell/        responsive AppShell: labeled sidebar (desktop) / header +
+                bottom tab bar (phones), mock-auth route guard
+  auth/ chat/ devices/ security/ recovery/ settings/   screens
+lib/
+  ui/           theme store, mock auth, namespaced prefs store, chat logic
+  mock/         strict types + mock data (devices, conversation, partner)
+tests/
+  spike.test.ts 17 crypto-spike tests (node env, unchanged)
+  ui/*.test.tsx 27 UI tests (jsdom + Testing Library)
+```
+
+Design system: CSS custom properties in `app/globals.css` (dark default, light
+via `data-theme`), Geist via `next/font`, one CSS module per area, focus-visible
+rings, `prefers-reduced-motion` support, WCAG-minded labels/roles.
+
+### What is stored locally (and nothing else)
+
+| Key | Contents |
+|---|---|
+| `messenger.ui.theme` | `dark` or `light` |
+| `messenger.ui.prefs` | display name + notification/privacy toggles |
+
+No passwords, private keys, recovery secrets, or message content are ever
+persisted; the mock session is in-memory only (refresh returns you to
+`/login`).
+
+### Running Phase 1
+
+```bash
+npm install
+npm run dev        # http://localhost:3000 → /login
+npm test           # 44 tests: 17 spike (node) + 27 UI (jsdom)
+npm run lint && npm run typecheck && npm run build
+```
+
+### Known Phase 1 limitations
+
+- Responsive behavior is CSS-driven; automated tests assert landmarks and
+  interactions, not media-query rendering (no visual-regression suite yet).
+- The mock typing indicator ignores the privacy toggle by design (disclosed
+  in the UI) — wiring preference-aware behavior needs a real messaging layer.
+- Safari was engine-tested only during Phase 0.5; the Phase 1 UI has not been
+  manually verified in the Safari app (see BLOCKERS.md).
+- No visual-regression or axe accessibility scan in this phase; accessibility
+  is via semantic markup, roles, labels, focus management, and keyboard paths.
+
+### Phase 1 file changes (summary)
+
+New: `lib/mock/*`, `lib/ui/*`, `components/**`, `app/{login,chat,devices,security,recovery,settings}/`, `tests/setup.ts`, `tests/ui/*`, `public/theme-init.js`.
+Modified: `app/layout.tsx` (providers, theme script, metadata), `app/globals.css` (design tokens), `vitest.config.ts` (jsdom UI tests), `package.json` (pinned dev deps: jsdom, Testing Library).
+Removed: scaffold boilerplate (`app/page.tsx` starter, `app/page.module.css`, unused `public/*.svg`).
+Untouched: `lib/spike/`, `app/spike/`, `tests/spike.test.ts`, `tests/vectors/`, `scripts/`, and the pinned crypto dependency.
+
+---
+
+# Appendix — Phase 0.5: Browser-Cryptography Feasibility Spike
 
 A minimal, isolated spike that answers one question before any messenger is
 built: **can `@kinsh/vodozemac-wasm` establish Olm sessions, reject tampered
@@ -125,11 +220,12 @@ route (Next 16 rejects `Math.random()` in a client component's render path).
 
 ## Removing the spike
 
-Delete `lib/spike/`, `app/spike/`, `tests/`, `scripts/copy-wasm.mjs`,
-`scripts/verify-browser.mjs`, the `postinstall`/`test`/`typecheck`/
-`verify:browser` scripts, and the pinned deps (`@kinsh/vodozemac-wasm`,
-`vitest`, `fake-indexeddb`, `playwright-core`). Nothing outside this list
-references spike code.
+Delete `lib/spike/`, `app/spike/`, `tests/spike.test.ts`, `tests/vectors/`,
+`scripts/copy-wasm.mjs`, `scripts/verify-browser.mjs`, the
+`postinstall`/`verify:browser` scripts, and the pinned spike-only deps
+(`@kinsh/vodozemac-wasm`, `playwright-core`, `fake-indexeddb`). Keep `tests/`,
+`tests/setup.ts`, and the UI-test toolchain — Phase 1 depends on them.
+Nothing outside this list references spike code.
 
 ## Documents
 

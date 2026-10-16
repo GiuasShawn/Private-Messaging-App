@@ -81,3 +81,39 @@ and real browsers. It shifts "will this library work in a browser at all?"
 from assumption to observation. It does not shift "is our messenger secure?"
 — that remains the job of Phase 1+ design (key management, server posture,
 metadata minimization) and, ultimately, external review.
+
+---
+
+# Phase 1 Addendum — UI Prototype
+
+**Status: interface only. No new security property is claimed.** Phase 1 adds
+screens, components, and tests on top of the untouched spike; none of the
+cryptography is wired into the messaging UI.
+
+## What the Phase 1 UI does
+
+1. **No network activity.** The mock chat, devices, recovery, and settings
+   flows are pure client state. `tests/ui/leak-guard.test.tsx` performs a
+   full signed-in interaction pass (sign in → send message → stage/reject
+   attachments → approve a device → toggle settings) with `fetch` and
+   `sendBeacon` instrumented and asserts **zero calls**.
+2. **Only harmless UI preferences are persisted**, in two namespaced
+   localStorage keys (`messenger.ui.theme`, `messenger.ui.prefs`). The same
+   test audits every stored key/value and asserts the typed password appears
+   nowhere. The mock session itself is in-memory only.
+3. **Mock authentication is disclosed, not disguised.** Any valid email with
+   an 8+ character password is accepted; the sign-in screen states this and
+   states that nothing is stored or sent. No production-authentication claim
+   is made anywhere in the UI.
+4. **No cryptographic verification is claimed.** Device verification labels
+   are qualified in-place ("Verified (simulated)"), the security screen
+   separates what Phase 0.5 proved from what is wired, and the recovery flow
+   generates, requests, and stores no secret (a test asserts the recovery
+   screen contains no input fields at all).
+
+## What Phase 1 does NOT change
+
+All "NOT proven" items above stand unchanged. In particular: the spike's key
+storage is still not production-acceptable, no server exists, metadata
+minimization is unaddressed, and no UI element in Phase 1 encrypts,
+transmits, uploads, verifies, or recovers anything.
