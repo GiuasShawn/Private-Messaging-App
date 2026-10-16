@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# generated from node_modules by postinstall (scripts/copy-wasm.mjs)
+/public/wasm/
+
 # next.js
 /.next/
 /out/
