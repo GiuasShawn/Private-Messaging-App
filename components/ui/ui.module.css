@@ -1,5 +1,12 @@
 /* Shared styles for UI primitives (buttons, fields, dialogs, panels). */
 
+/* ---------- Brand monogram ---------- */
+
+.monogram {
+  flex: none;
+  display: block;
+}
+
 /* ---------- Buttons ---------- */
 
 .button {

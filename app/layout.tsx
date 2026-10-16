@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { AppProviders } from "@/components/AppProviders";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         {/* Applies the persisted/system theme before hydration; see public/theme-init.js */}
         <Script src="/theme-init.js" strategy="beforeInteractive" />
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
