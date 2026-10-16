@@ -14,7 +14,7 @@
     } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
       theme = "light";
     }
-  } catch (e) {
+  } catch {
     // localStorage may be unavailable (private mode, blocked cookies).
   }
   document.documentElement.setAttribute("data-theme", theme);
