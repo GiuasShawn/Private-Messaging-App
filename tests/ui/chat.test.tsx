@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ChatScreen } from "@/components/chat/ChatScreen";
@@ -16,15 +16,25 @@ async function openSimulateMenu(user: ReturnType<typeof userEvent.setup>) {
 
 describe("chat screen", () => {
   it("shows a loading skeleton, then the seeded history with date separators", async () => {
-    render(<ChatScreen />);
+    // The seed timestamps are relative to "now" (lib/mock/data.ts), so the
+    // Today/Yesterday separators are only deterministic under a fixed clock:
+    // a wall-clock run shortly after local midnight has no "Today" messages
+    // at all. Freeze a midday-in-every-timezone instant; shouldAdvanceTime
+    // keeps Testing Library's findBy*/waitFor timeouts flowing.
+    vi.useFakeTimers({ now: new Date("2026-06-10T13:00:00Z"), shouldAdvanceTime: true });
+    try {
+      render(<ChatScreen />);
 
-    expect(screen.getByRole("status", { name: "Loading messages" })).toBeInTheDocument();
+      expect(screen.getByRole("status", { name: "Loading messages" })).toBeInTheDocument();
 
-    await screen.findByText("Morning! Did the prototype build go through?");
-    expect(screen.getByText("Yesterday")).toBeInTheDocument();
-    expect(screen.getByText("Today")).toBeInTheDocument();
-    // Simulated-attachment disclosure is visible in the composer.
-    expect(screen.getByText(/Simulated attachments/)).toBeInTheDocument();
+      await screen.findByText("Morning! Did the prototype build go through?");
+      expect(screen.getByText("Yesterday")).toBeInTheDocument();
+      expect(screen.getByText("Today")).toBeInTheDocument();
+      // Simulated-attachment disclosure is visible in the composer.
+      expect(screen.getByText(/Simulated attachments/)).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("sends on Enter and walks sending → sent → delivered, then gets a mock reply", async () => {
