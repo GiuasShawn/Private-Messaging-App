@@ -216,3 +216,18 @@ export const SignOutIcon = (p: IconProps) => (
     <path d="m15 16 4-4-4-4M19 12H9" />
   </svg>
 );
+
+export const RefreshIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M20.5 12a8.5 8.5 0 1 1-2.5-6" />
+    <path d="M20.5 4v5h-5" />
+  </svg>
+);
+
+export const EllipsisIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="5.5" r="1.4" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none" />
+  </svg>
+);

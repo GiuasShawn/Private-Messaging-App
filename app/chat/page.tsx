@@ -1,15 +1,10 @@
 import { AppShell } from "@/components/shell/AppShell";
-import { EmptyState } from "@/components/ui/Tooltip";
-import { MessageIcon } from "@/components/ui/icons";
+import { ChatScreen } from "@/components/chat/ChatScreen";
 
 export default function ChatPage() {
   return (
     <AppShell title="Chat">
-      <EmptyState
-        icon={<MessageIcon size={22} />}
-        title="Chat screen"
-        description="The conversation UI lands in the next checkpoint of Phase 1."
-      />
+      <ChatScreen />
     </AppShell>
   );
 }
