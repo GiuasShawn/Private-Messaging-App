@@ -1,0 +1,100 @@
+/* General settings screen. */
+
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6) clamp(var(--space-4), 5vw, var(--space-10))
+    var(--space-10);
+}
+
+.inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 660;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin-top: 4px;
+  max-width: 560px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* ---------- Theme selector ---------- */
+
+.themeGroup {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.themeOption {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 38px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 560;
+  transition: border-color var(--transition), color var(--transition),
+    background var(--transition);
+}
+
+.themeOption:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.themeOptionActive,
+.themeOptionActive:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong);
+}
+
+.swatchDark {
+  background: #0b0e12;
+}
+
+.swatchLight {
+  background: #f4f6f9;
+  border-color: var(--border-strong);
+}
+
+/* ---------- Profile ---------- */
+
+.profileRow {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.profileField {
+  flex: 1;
+  min-width: 240px;
+}
+
+.storageHint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}

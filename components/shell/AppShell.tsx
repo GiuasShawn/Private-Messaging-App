@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import styles from "./shell.module.css";
 import { useMockAuth } from "@/lib/ui/auth";
+import { initialsFor, useLocalUiPrefs } from "@/lib/ui/prefs";
 import { Avatar } from "@/components/ui/Avatar";
 import { Monogram } from "@/components/ui/Monogram";
 import {
@@ -43,6 +44,7 @@ export interface AppShellProps {
  */
 export function AppShell({ title, children }: AppShellProps) {
   const { user, signOut } = useMockAuth();
+  const [localPrefs] = useLocalUiPrefs();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -94,9 +96,15 @@ export function AppShell({ title, children }: AppShellProps) {
           })}
         </nav>
         <div className={styles.userBlock}>
-          <Avatar initials={user.initials} size="sm" label={user.displayName} />
+          <Avatar
+            initials={initialsFor(localPrefs.displayName)}
+            size="sm"
+            label={localPrefs.displayName.trim() || "You"}
+          />
           <span className={styles.userText}>
-            <span className={styles.userName}>{user.displayName}</span>
+            <span className={styles.userName}>
+              {localPrefs.displayName.trim() || "You"}
+            </span>
             <span className={styles.userEmail}>{user.email}</span>
           </span>
           <button

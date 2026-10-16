@@ -8,6 +8,11 @@ import {
   type ReactNode,
 } from "react";
 import type { MockUser } from "@/lib/mock/types";
+import {
+  DEFAULT_LOCAL_PREFS,
+  getLocalUiPrefs,
+  setLocalUiPrefs,
+} from "@/lib/ui/prefs";
 
 export type SignInResult = { ok: true } | { ok: false; message: string };
 
@@ -74,6 +79,10 @@ export function MockAuthProvider({ children }: { children: ReactNode }) {
       // Simulated latency only; no request is made and nothing is sent.
       await new Promise((resolve) => setTimeout(resolve, MOCK_SIGN_IN_DELAY_MS));
       const displayName = deriveDisplayName(email.trim());
+      // Seed the local profile name on first sign-in (harmless UI pref).
+      if (getLocalUiPrefs().displayName === DEFAULT_LOCAL_PREFS.displayName) {
+        setLocalUiPrefs({ ...getLocalUiPrefs(), displayName });
+      }
       setUser({
         id: "mock-user",
         email: email.trim(),

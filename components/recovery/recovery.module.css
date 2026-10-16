@@ -1,0 +1,137 @@
+/* Recovery screen: page frame + simulated backup/restore flow. */
+
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6) clamp(var(--space-4), 5vw, var(--space-10))
+    var(--space-10);
+}
+
+.inner {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 660;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin-top: 4px;
+  max-width: 560px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* ---------- Recovery flow ---------- */
+
+.flowBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.flowHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 620;
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+
+.stepActive {
+  color: var(--text-primary);
+}
+
+.stepDone {
+  color: var(--text-secondary);
+}
+
+.stepDot {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+}
+
+.stepDone .stepDot {
+  background: var(--success-soft);
+  border-color: transparent;
+  color: var(--success);
+}
+
+.stepActive .stepDot {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.resultBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-6) var(--space-5);
+  background: var(--bg-inset);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.resultIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.resultTitle {
+  font-size: var(--text-lg);
+  font-weight: 640;
+}
+
+.resultDesc {
+  max-width: 440px;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.flowActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
