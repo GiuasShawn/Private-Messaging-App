@@ -1,0 +1,72 @@
+# Haven CI.
+#
+# No CI existed before this workflow; this is the repository's first, added
+# with Phase 2 Step 2. It runs only against local/self-contained resources:
+# no hosted Supabase project, no production credentials, no secrets.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Silences the spike's wasm config-native dependency warning in CI logs.
+      VITE_CONFIG_NATIVE_IGNORE_WARNING: "true"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+      - name: Production build
+        run: npm run build
+      - name: Unit tests (vitest; bundle-leak test reuses the build above)
+        run: npx vitest run
+      - name: Client-bundle secret scan
+        run: npm run verify:bundle
+
+  database:
+    name: Supabase migrations + RLS verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SUPABASE_DISABLE_ANALYTICS: "true"
+      DO_NOT_TRACK: "1"
+      # The `supabase start` local database; nothing hosted is contacted.
+      SUPABASE_DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      # The Supabase CLI is the pinned npm devDependency (supabase@2.121.0),
+      # so `npx supabase` is the same reproducible version locally and here.
+      - run: npm ci
+      - name: Start local Supabase services
+        run: npx supabase start
+      - name: Apply migrations to a clean database
+        run: npx supabase db reset
+      - name: Verify schema, constraints, grants, and RLS policies
+        run: npm run verify:db
+      - name: Stop local Supabase services
+        if: always()
+        run: npx supabase stop --no-backup

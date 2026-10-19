@@ -1,0 +1,3 @@
+-- Haven local seed. Intentionally empty: the local database is populated only
+-- by migrations and by explicit verification/provisioning tooling. Never seed
+-- real account data here.
