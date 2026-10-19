@@ -1,4 +1,4 @@
-/* General settings screen. */
+/* Settings screen: sectioned layout per the Haven designs. */
 
 .page {
   flex: 1;
@@ -9,11 +9,51 @@
 }
 
 .inner {
-  max-width: 760px;
+  max-width: 820px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-8);
+}
+
+.pageHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.revisionPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.revisionDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--success);
 }
 
 .title {
@@ -23,61 +63,84 @@
 }
 
 .subtitle {
-  margin-top: 4px;
+  margin-top: var(--space-2);
   max-width: 560px;
   color: var(--text-secondary);
   font-size: var(--text-sm);
 }
 
-/* ---------- Theme selector ---------- */
+/* ---------- Section headings ---------- */
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+  font-weight: 640;
+  margin-bottom: 2px;
+}
+
+.sectionIcon {
+  display: inline-flex;
+  color: var(--text-secondary);
+}
+
+.dangerTitle {
+  color: var(--danger);
+}
+
+.sectionSub {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.panelFootnote {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-3);
+}
+
+/* ---------- Theme selector (segmented control, design) ---------- */
 
 .themeGroup {
   display: inline-flex;
-  gap: var(--space-2);
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
 }
 
 .themeOption {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  height: 38px;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: var(--bg-raised);
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   font-size: var(--text-sm);
   font-weight: 560;
-  transition: border-color var(--transition), color var(--transition),
-    background var(--transition);
+  transition: background var(--transition), color var(--transition);
 }
 
 .themeOption:hover {
-  background: var(--bg-hover);
   color: var(--text-primary);
 }
 
 .themeOptionActive,
 .themeOptionActive:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: var(--radius-full);
+  background: var(--bg-raised);
   border: 1px solid var(--border-strong);
+  color: var(--text-primary);
 }
 
-.swatchDark {
-  background: #0b0e12;
-}
-
-.swatchLight {
-  background: #f4f6f9;
-  border-color: var(--border-strong);
+.themeIcon {
+  display: inline-flex;
 }
 
 /* ---------- Profile ---------- */
@@ -94,7 +157,127 @@
   min-width: 240px;
 }
 
+.inputWithChip {
+  position: relative;
+  display: block;
+}
+
+.peerChip {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.saveState {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--success);
+  white-space: nowrap;
+  padding-bottom: 10px;
+}
+
+.identifierRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.identifierValue {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.mockChip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
 .storageHint {
   font-size: var(--text-xs);
   color: var(--text-muted);
+  padding-top: var(--space-3);
+}
+
+/* ---------- Out-of-nav module links (Security / Recovery) ---------- */
+
+.moduleLink {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-raised);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 560;
+  white-space: nowrap;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.moduleLink:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ---------- Danger zone ---------- */
+
+.dangerCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-lg);
+  background: var(--danger-soft);
+}
+
+.dangerCardTitle {
+  font-weight: 620;
+  font-size: var(--text-sm);
+  color: var(--danger);
+}
+
+.dangerCardDesc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  margin-top: 2px;
+  max-width: 460px;
+}
+
+/* ---------- Footer ---------- */
+
+.footerLine {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: var(--space-2);
+}
+
+@media (max-width: 560px) {
+  .profileRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .saveState {
+    padding-bottom: 0;
+  }
 }

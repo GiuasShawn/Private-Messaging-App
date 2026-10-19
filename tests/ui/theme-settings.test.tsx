@@ -1,18 +1,18 @@
 /** @vitest-environment jsdom */
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ThemeProvider } from "@/lib/ui/theme";
 import { SettingsScreen } from "@/components/settings/SettingsScreen";
 import { AppShell } from "@/components/shell/AppShell";
 
-const { replace, pathname } = vi.hoisted(() => ({
+const { replace, nav } = vi.hoisted(() => ({
   replace: vi.fn(),
-  pathname: "/chat",
+  nav: { pathname: "/chat" },
 }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace }),
-  usePathname: () => pathname,
+  usePathname: () => nav.pathname,
 }));
 vi.mock("@/lib/ui/auth", () => ({
   useMockAuth: () => ({
@@ -108,31 +108,93 @@ describe("general settings", () => {
 });
 
 describe("responsive navigation", () => {
-  it("renders all destinations in sidebar and bottom nav with current-page state", () => {
+  it("renders exactly the three primary destinations with current-page state", () => {
     render(
       <ThemeProvider>
-        <AppShell title="Chat">
+        <AppShell title="Messages">
           <p>screen content</p>
         </AppShell>
       </ThemeProvider>,
     );
 
-    // Sidebar + bottom tab bar each expose every destination.
-    for (const label of ["Chat", "Devices", "Security", "Recovery", "Settings"]) {
+    // Sidebar + bottom tab bar each expose exactly the three destinations.
+    for (const label of ["Messages", "Devices", "Settings"]) {
       expect(screen.getAllByRole("link", { name: label }).length).toBeGreaterThanOrEqual(1);
     }
 
-    for (const chatLink of screen.getAllByRole("link", { name: "Chat" })) {
-      expect(chatLink).toHaveAttribute("aria-current", "page");
+    // Security and Recovery are deliberately NOT in the primary nav.
+    expect(screen.queryByRole("link", { name: "Security" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Recovery" })).not.toBeInTheDocument();
+
+    for (const messagesLink of screen.getAllByRole("link", { name: "Messages" })) {
+      expect(messagesLink).toHaveAttribute("aria-current", "page");
     }
     for (const devicesLink of screen.getAllByRole("link", { name: "Devices" })) {
       expect(devicesLink).not.toHaveAttribute("aria-current");
     }
 
     expect(screen.getByText("screen content")).toBeInTheDocument();
-    // Sign-out affordance exists in both the sidebar and the mobile header.
-    expect(
-      screen.getAllByRole("button", { name: "Sign out" }).length,
-    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("marks the active destination on other routes too", () => {
+    nav.pathname = "/devices";
+    render(
+      <ThemeProvider>
+        <AppShell title="Devices">
+          <p>screen content</p>
+        </AppShell>
+      </ThemeProvider>,
+    );
+    for (const devicesLink of screen.getAllByRole("link", { name: "Devices" })) {
+      expect(devicesLink).toHaveAttribute("aria-current", "page");
+    }
+    for (const messagesLink of screen.getAllByRole("link", { name: "Messages" })) {
+      expect(messagesLink).not.toHaveAttribute("aria-current");
+    }
+    nav.pathname = "/chat";
+  });
+});
+
+describe("out-of-nav modules stay reachable", () => {
+  it("links to Security and Recovery from Settings (no dead ends)", () => {
+    render(
+      <ThemeProvider>
+        <SettingsScreen />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole("link", { name: "Open security" })).toHaveAttribute(
+      "href",
+      "/security",
+    );
+    expect(screen.getByRole("link", { name: "Open recovery" })).toHaveAttribute(
+      "href",
+      "/recovery",
+    );
+    // The forgot-password route is still advertised on the sign-in screen.
+    // (Covered in auth tests via the /recovery link.)
+  });
+
+  it("sign-out asks for confirmation and calls the mock sign-out", async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeProvider>
+        <SettingsScreen />
+      </ThemeProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(/mock session/i);
+
+    // Cancel keeps the session; confirming calls signOut (mock, in-memory).
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    await screen.findByRole("dialog");
+    await user.click(
+      within(screen.getByRole("dialog")).getByRole("button", { name: "Sign out" }),
+    );
   });
 });

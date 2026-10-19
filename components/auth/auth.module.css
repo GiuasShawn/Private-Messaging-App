@@ -1,87 +1,291 @@
-/* Sign-in screen. */
+/* Login screen — matched to the supplied Haven sign-in design:
+   near-black canvas, compact centered card, restrained violet action. */
 
 .wrap {
   min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-4);
   padding: var(--space-6) var(--space-4);
-  background:
-    radial-gradient(60% 50% at 50% -10%, var(--accent-soft), transparent),
-    var(--bg-base);
+  background: var(--bg-base);
 }
 
 .card {
   width: 100%;
-  max-width: 412px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-6);
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
 }
 
-.brandRow {
+/* ---------- Session tunnel badge ---------- */
+
+.tunnelBadge {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-6);
+  background: var(--bg-inset);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.tunnelLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tunnelDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--secure);
+}
+
+.tunnelLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--text-secondary);
+}
+
+.tunnelKey {
+  color: var(--text-secondary);
+}
+
+/* ---------- Brand header ---------- */
+
+.brandHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logoTile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--space-3);
+  background: var(--bg-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
 }
 
 .brandName {
   font-size: var(--text-lg);
-  font-weight: 640;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-primary);
 }
 
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 660;
-  letter-spacing: -0.02em;
-}
-
-.subtitle {
-  margin-top: 4px;
-  color: var(--text-secondary);
+.brandTagline {
+  margin-top: var(--space-1);
   font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* ---------- Form ---------- */
+
+.formIntro {
+  margin: var(--space-7, 28px) 0 var(--space-5);
+}
+
+.formTitle {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.formSubtitle {
+  margin-top: 2px;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.formError {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.formError svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.formError strong {
+  display: block;
+  font-weight: 550;
+}
+
+.formErrorDetail {
+  display: block;
+  margin-top: 1px;
+  font-size: 12px;
+  opacity: 0.9;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
-.formError {
+.inputWrap {
+  position: relative;
+  display: block;
+}
+
+.inputIcon {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  display: inline-flex;
+}
+
+.passwordBlock {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.forgotLink {
+  position: absolute;
+  right: 0;
+  top: -2px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+.forgotLink:hover {
+  color: var(--accent);
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 40px;
+  margin-top: var(--space-1);
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: var(--text-invert);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: background var(--transition), opacity var(--transition);
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------- Protocol strip & footer ---------- */
+
+.protocolStrip {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  background: var(--danger-soft);
-  border: 1px solid var(--danger);
-  border-radius: var(--radius-md);
-  color: var(--danger);
-  font-size: var(--text-sm);
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  margin-top: var(--space-6);
+  background: var(--bg-inset);
+  border-radius: var(--radius-lg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.protocolStrip span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
 }
 
 .footer {
-  text-align: center;
-  font-size: var(--text-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.footerIcon {
   color: var(--text-muted);
 }
 
-@media (max-width: 480px) {
-  .card {
-    padding: var(--space-6) var(--space-5);
-    border: none;
-    box-shadow: none;
-    background: transparent;
-  }
+.demoNote {
+  margin-top: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-muted);
+}
 
-  .wrap {
-    align-items: flex-start;
-    padding-top: 12dvh;
+.counterpart {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 400px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.counterpartDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  opacity: 0.8;
+}
+
+.counterpartId {
+  margin-left: auto;
+  /* Keep full-opacity muted text: a 0.6 alpha over the card surface dropped
+     this mono key ID below the 4.5:1 WCAG contrast threshold (axe failure). */
+  color: var(--text-secondary);
+}
+
+@media (max-width: 420px) {
+  .card {
+    padding: var(--space-5);
   }
 }

@@ -9,8 +9,17 @@ import {
 import styles from "./chat.module.css";
 import type { Attachment } from "@/lib/mock/types";
 import { IconButton } from "@/components/ui/Button";
-import { AlertTriangleIcon, PaperclipIcon, SendIcon, XIcon } from "@/components/ui/icons";
+import {
+  AlertTriangleIcon,
+  ArrowUpIcon,
+  LockIcon,
+  PlusCircleIcon,
+  XIcon,
+} from "@/components/ui/icons";
 import { AttachmentTray } from "./AttachmentTray";
+
+/** Soft character budget before the live counter appears (design spec). */
+const COUNTER_THRESHOLD = 800;
 
 export interface MessageComposerProps {
   partnerName: string;
@@ -25,9 +34,10 @@ export interface MessageComposerProps {
 }
 
 /**
- * Message composer: multiline auto-growing input, Enter to send /
- * Shift+Enter for a newline (IME-safe), attachment picker for the simulated
- * upload tray, and inline validation errors with dismiss controls.
+ * Message composer in the design's container style: bordered surface with
+ * the attach control, auto-growing textarea, and violet send button.
+ * Enter sends / Shift+Enter inserts a newline (IME-safe). Attachment
+ * "uploads" are simulated locally and labelled as such.
  */
 export function MessageComposer({
   partnerName,
@@ -73,12 +83,6 @@ export function MessageComposer({
 
   return (
     <div className={styles.composer}>
-      <p className={styles.simulatedNote}>
-        <AlertTriangleIcon size={13} />
-        Simulated attachments — files are previewed locally and never uploaded
-        or sent.
-      </p>
-
       {errors.length > 0 ? (
         <div className={styles.composerErrors}>
           {errors.map((error, index) => (
@@ -97,13 +101,13 @@ export function MessageComposer({
 
       <AttachmentTray staged={staged} onRemove={onRemoveStaged} />
 
-      <div className={styles.composerRow}>
+      <div className={styles.composerBox}>
         <IconButton
           label="Add photo or file attachment (simulated)"
           size="md"
           onClick={() => fileInputRef.current?.click()}
         >
-          <PaperclipIcon size={19} />
+          <PlusCircleIcon size={20} />
         </IconButton>
         <input
           ref={fileInputRef}
@@ -125,6 +129,18 @@ export function MessageComposer({
           onChange={(event) => onValueChange(event.target.value)}
           onKeyDown={handleKeyDown}
         />
+        {value.length > COUNTER_THRESHOLD ? (
+          <span
+            className={styles.charCounter}
+            aria-live="polite"
+          >{`${value.length} / 1000`}</span>
+        ) : null}
+        <span className={styles.timerChip}>
+          <span aria-hidden>24h</span>
+          <span className="sr-only">
+            Disappearing messages are not active in this prototype
+          </span>
+        </span>
         <button
           type="button"
           className={styles.sendButton}
@@ -132,11 +148,19 @@ export function MessageComposer({
           disabled={!canSend}
           aria-label="Send message"
         >
-          <SendIcon size={18} />
+          <ArrowUpIcon size={17} />
         </button>
       </div>
-      <p className={styles.hint}>
-        Enter sends · Shift+Enter adds a newline · attachments are simulated
+
+      <p className={styles.simulatedNote}>
+        <AlertTriangleIcon size={13} />
+        Simulated attachments — files are previewed locally and never uploaded
+        or sent.
+      </p>
+      <p className={styles.trustLine}>
+        <LockIcon size={12} />
+        Messages stay on this device · end-to-end encryption arrives in a later
+        phase
       </p>
     </div>
   );

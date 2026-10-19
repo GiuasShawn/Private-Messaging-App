@@ -125,17 +125,25 @@ async function runScheme(browser, scheme) {
   );
   await page.keyboard.press("Escape");
 
+  // Security and Recovery are no longer primary-nav destinations; their
+  // routes remain live and are reached through the Settings module links.
+  // Client-side navigation is required: a full page load remounts the app
+  // and the in-memory mock session returns to /login.
+  await page.locator('a[href="/settings"]:visible').first().click();
+  await page.waitForURL("**/settings");
   await page.locator('a[href="/security"]:visible').first().click();
   await page.waitForURL("**/security");
   await page.getByText("Encryption status").waitFor();
   allViolations.push(...(await scan(page, `/security (desktop, ${scheme})`)));
 
+  await page.goBack();
+  await page.waitForURL("**/settings");
   await page.locator('a[href="/recovery"]:visible').first().click();
   await page.waitForURL("**/recovery");
   await page.getByText("Recovery backup").waitFor();
   allViolations.push(...(await scan(page, `/recovery (desktop, ${scheme})`)));
 
-  await page.locator('a[href="/settings"]:visible').first().click();
+  await page.goBack();
   await page.waitForURL("**/settings");
   await page.getByRole("heading", { name: "Appearance", exact: true }).waitFor();
   allViolations.push(...(await scan(page, `/settings (desktop, ${scheme})`)));

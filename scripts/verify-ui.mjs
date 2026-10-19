@@ -141,21 +141,24 @@ async function assertNotCovered(page, locator, label) {
 
 async function assertNavMode(page, mode) {
   const aside = page.locator("aside");
-  const header = page.locator("header").first();
+  const topbar = page.locator("header").first();
+  const bottomNav = page.locator("nav.bottomNav, nav[aria-label='Primary']").last();
   const visibleNavs = page.locator("nav[aria-label='Primary']:visible");
   const navCount = await visibleNavs.count();
   const navBox = navCount > 0 ? await visibleNavs.first().boundingBox() : null;
+  const bottomNavVisible = await bottomNav.isVisible().catch(() => false);
 
   if (mode === "mobile") {
     report((await aside.count()) === 0 || !(await aside.isVisible()), "nav: sidebar hidden on mobile");
-    report(await header.isVisible(), "nav: mobile header visible");
+    report(await topbar.isVisible(), "nav: top status bar visible on mobile");
     report(navCount === 1, "nav: exactly one primary nav visible", `count=${navCount}`);
     report(!!navBox && navBox.y > 300, "nav: primary nav sits at the bottom", navBox ? `y=${Math.round(navBox.y)}` : "no box");
+    report(bottomNavVisible, "nav: bottom tab bar visible on mobile");
   } else {
     report(await aside.isVisible(), "nav: sidebar visible on ≥768px");
-    report(!((await header.count()) > 0 && await header.isVisible()), "nav: mobile header hidden");
     report(navCount === 1, "nav: exactly one primary nav visible", `count=${navCount}`);
     report(!!navBox && navBox.x < 400, "nav: primary nav is the left sidebar", navBox ? `x=${Math.round(navBox.x)}` : "no box");
+    report(!bottomNavVisible, "nav: bottom tab bar hidden on desktop");
   }
 }
 
@@ -301,9 +304,11 @@ async function runViewport(browser, vp) {
   const approveBtn = page.getByRole("button", { name: "Approve" });
   await approveBtn.scrollIntoViewIfNeeded();
   await approveBtn.click();
-  await page.getByText("Pending approval").waitFor({ state: "detached", timeout: 3000 }).catch(() => {});
+  // The pending badge and its amber "Requested …" activity text disappear
+  // from the device row (the stat-strip label "Pending approval" remains).
+  await page.getByText(/Requested \d+ min ago/).waitFor({ state: "detached", timeout: 3000 }).catch(() => {});
   report(
-    (await page.getByText("Pending approval").count()) === 0,
+    (await page.getByText(/Requested \d+ min ago/).count()) === 0,
     "/devices: approve action works in real browser",
   );
 
@@ -356,8 +361,13 @@ async function runViewport(browser, vp) {
   await page.keyboard.press("Escape");
   await revokeDialog.waitFor({ state: "detached" });
 
-  // 8. Security: usable toggles
-  await gotoViaNav(page, "/security");
+  // 8–9. Security and Recovery are out of primary nav; their routes remain
+  //      live and are reached through the Settings module links. Navigation
+  //      must be client-side: a full page load would remount the app and the
+  //      in-memory mock session (like a real refresh) returns to /login.
+  await gotoViaNav(page, "/settings");
+  await page.locator('a[href="/security"]:visible').first().click();
+  await page.waitForURL("**/security");
   await page.getByText("Encryption status").waitFor();
   await noHorizontalOverflow(page, "/security");
   await controlsWithinViewport(page, "/security");
@@ -368,8 +378,11 @@ async function runViewport(browser, vp) {
   const after = await receiptSwitch.getAttribute("aria-checked");
   report(before !== after, "/security: privacy toggle toggles", `${before} → ${after}`);
 
-  // 9. Recovery: simulated flow runs and fits
-  await gotoViaNav(page, "/recovery");
+  // Back to Settings, then into Recovery via its module link.
+  await page.goBack();
+  await page.waitForURL("**/settings");
+  await page.locator('a[href="/recovery"]:visible').first().click();
+  await page.waitForURL("**/recovery");
   await noHorizontalOverflow(page, "/recovery");
   await controlsWithinViewport(page, "/recovery");
   const setupBtn = page.getByRole("button", { name: "Set up recovery (simulated)" });
@@ -381,7 +394,8 @@ async function runViewport(browser, vp) {
   await controlsWithinViewport(page, "/recovery (result)");
 
   // 10. Settings: theme switch works
-  await gotoViaNav(page, "/settings");
+  await page.goBack();
+  await page.waitForURL("**/settings");
   await page.getByRole("heading", { name: "Appearance", exact: true }).waitFor();
   await noHorizontalOverflow(page, "/settings");
   await controlsWithinViewport(page, "/settings");

@@ -1,10 +1,11 @@
-/* App shell: labeled sidebar on desktop, header + bottom tab bar on phones. */
+/* App shell per the supplied Haven designs: fixed 260px sidebar on desktop,
+   slim secure-status top bar; compact header + bottom tab bar on phones. */
 
 .shell {
   display: grid;
   height: 100dvh;
-  grid-template-columns: 232px 1fr;
-  grid-template-areas: "sidebar main";
+  grid-template-columns: 260px 1fr;
+  grid-template-areas: "sidebar content";
   background: var(--bg-base);
 }
 
@@ -14,69 +15,116 @@
   grid-area: sidebar;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   min-height: 0;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-inset);
+  border-right: 1px solid var(--border-strong);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-5) var(--space-5) var(--space-4);
+  height: 56px;
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.brandGlyph {
+  flex: none;
 }
 
 .brandName {
   font-size: var(--text-lg);
-  font-weight: 640;
+  font-weight: 600;
   letter-spacing: -0.01em;
+  color: var(--text-primary);
 }
 
 .brandTag {
-  font-size: 10.5px;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  margin-left: auto;
+}
+
+.navLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: var(--space-4) var(--space-3) var(--space-2);
 }
 
 .nav {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--space-2);
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
 }
 
 .navItem {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  height: 42px;
+  height: 38px;
   padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
   color: var(--text-secondary);
-  font-weight: 540;
-  transition: background var(--transition), color var(--transition);
+  font-size: var(--text-base);
+  transition: background var(--transition), color var(--transition),
+    border-color var(--transition);
 }
 
 .navItem:hover {
-  background: var(--bg-hover);
+  background: var(--bg-raised);
   color: var(--text-primary);
 }
 
 .navItemActive,
 .navItemActive:hover {
-  background: var(--accent-soft);
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
   color: var(--accent);
 }
 
-.navIcon {
+.sidebarExtra {
+  margin-top: var(--space-5);
+  min-height: 0;
+}
+
+/* ---------- Sidebar footer ---------- */
+
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-top: 1px solid var(--border-strong);
+}
+
+.privatePill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.privatePill svg {
+  color: var(--secure);
   flex: none;
 }
 
@@ -84,25 +132,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-4);
-  border-top: 1px solid var(--border-subtle);
-}
-
-.signOutButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  transition: background var(--transition), color var(--transition);
-}
-
-.signOutButton:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+  padding: 0 var(--space-2);
 }
 
 .userText {
@@ -115,32 +145,116 @@
 
 .userName {
   font-size: var(--text-sm);
-  font-weight: 580;
+  font-weight: 500;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.userEmail {
-  font-size: var(--text-xs);
+.userMeta {
+  font-family: var(--font-mono);
+  font-size: 10px;
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ---------- Mobile header & bottom nav (hidden on desktop) ---------- */
+.userAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  transition: background var(--transition), color var(--transition);
+}
 
-.mobileHeader,
-.bottomNav {
+.userAction:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ---------- Content column & top bar ---------- */
+
+.content {
+  grid-area: content;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex: none;
+  height: 56px;
+  padding: 0 var(--space-4);
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.topbarBrand {
   display: none;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.topbarWord {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.secureIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+.secureDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--secure);
+}
+
+.secureWord {
+  color: var(--secure);
+  font-weight: 500;
+}
+
+.secureSep {
+  color: var(--text-muted);
+}
+
+.secureKey {
+  color: var(--text-muted);
+}
+
+.topbarTitle {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  font-weight: 550;
+  font-size: var(--text-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .main {
-  grid-area: main;
+  flex: 1;
   min-width: 0;
   min-height: 0;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -157,61 +271,53 @@
 
 /* ---------- Tablet & phone ---------- */
 
+.bottomNav {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .shell {
     grid-template-columns: 1fr;
     grid-template-areas:
-      "header"
-      "main"
-      "bottomNav";
-    grid-template-rows: auto 1fr auto;
+      "content";
   }
 
   .sidebar {
     display: none;
   }
 
-  .mobileHeader {
-    grid-area: header;
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    height: 54px;
-    padding: 0 var(--space-4);
-    background: var(--bg-surface);
-    border-bottom: 1px solid var(--border-subtle);
+  .topbarBrand {
+    display: inline-flex;
   }
 
-  .mobileTitle {
-    flex: 1;
-    min-width: 0;
-    font-weight: 620;
-    font-size: var(--text-base);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .topbarTitle {
+    display: block;
+    text-align: right;
+  }
+
+  .secureKey,
+  .secureSep {
+    display: none;
   }
 
   .bottomNav {
-    grid-area: bottomNav;
     display: flex;
-    background: var(--bg-surface);
-    border-top: 1px solid var(--border-subtle);
+    flex: none;
+    background: var(--bg-inset);
+    border-top: 1px solid var(--border-strong);
     padding-bottom: env(safe-area-inset-bottom);
   }
 
   .bottomNavItem {
     flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    padding: var(--space-2) 0 var(--space-1);
-    min-height: 56px;
+    min-height: 52px;
     color: var(--text-muted);
-    font-size: 10.5px;
-    font-weight: 560;
+    font-size: 12px;
+    font-weight: 500;
+    border-top: 2px solid transparent;
     transition: color var(--transition);
   }
 
@@ -222,10 +328,10 @@
   .bottomNavItemActive,
   .bottomNavItemActive:hover {
     color: var(--accent);
+    border-top-color: var(--accent);
   }
 
   .main {
-    height: auto;
     min-height: 0;
   }
 }

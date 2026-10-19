@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./chat.module.css";
 import type { Participant, PresenceState } from "@/lib/mock/types";
 import { Avatar } from "@/components/ui/Avatar";
-import { EllipsisIcon } from "@/components/ui/icons";
+import { EllipsisIcon, LockIcon } from "@/components/ui/icons";
 
 export type HistoryStateChoice = "ready" | "loading" | "error" | "empty";
 
@@ -15,10 +15,12 @@ export interface ChatHeaderProps {
 }
 
 /**
- * Conversation header: avatar, display name, connection status, and a demo
- * menu that switches the history between its mock loading/error/empty/ready
- * states for interface review. The menu is a real disclosure button
- * (aria-expanded) and closes on Escape or outside click.
+ * Conversation header matching the supplied designs: avatar with presence
+ * dot, display name with a simulated session fingerprint, and a live status
+ * line. The trailing ⋯ button is the demo-options disclosure that switches
+ * the mock history between its loading/error/empty/ready states for
+ * interface review — a real menu button that closes on Escape or outside
+ * click.
  */
 export function ChatHeader({
   partner,
@@ -64,7 +66,12 @@ export function ChatHeader({
         label={partner.displayName}
       />
       <div className={styles.headerText}>
-        <h1 className={styles.partnerName}>{partner.displayName}</h1>
+        <h1 className={styles.partnerName}>
+          {partner.displayName}
+          <span className={styles.partnerKey} aria-hidden>
+            0x7B..92F4
+          </span>
+        </h1>
         <span
           className={
             presence === "typing"
@@ -76,6 +83,13 @@ export function ChatHeader({
           aria-live="polite"
         >
           {statusText}
+          <span className={styles.presenceSep} aria-hidden>
+            ·
+          </span>
+          <LockIcon size={11} />
+          <span className={styles.presenceProto}>
+            Signal Protocol v3 · simulated
+          </span>
         </span>
       </div>
 

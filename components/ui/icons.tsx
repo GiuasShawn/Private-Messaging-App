@@ -231,3 +231,109 @@ export const EllipsisIcon = (p: IconProps) => (
     <circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none" />
   </svg>
 );
+
+export const ComposeIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-7" />
+    <path d="M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.4-9.4Z" />
+  </svg>
+);
+
+export const PlusCircleIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 8.5v7M8.5 12h7" />
+  </svg>
+);
+
+export const ArrowUpIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 19V5M6 11l6-6 6 6" />
+  </svg>
+);
+
+export const LaptopIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="4" y="5" width="16" height="10" rx="1.5" />
+    <path d="M2.5 19h19" />
+  </svg>
+);
+
+export const CheckCircleIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m8.5 12 2.5 2.5 4.5-5" />
+  </svg>
+);
+
+export const BlockIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m5.6 5.6 12.8 12.8" />
+  </svg>
+);
+
+export const FingerprintIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 11a2 2 0 0 0-2 2c0 3-.6 5.5-1.5 7.5" />
+    <path d="M12 7.5a5.5 5.5 0 0 1 5.5 5.5c0 1.4-.1 2.8-.4 4.1" />
+    <path d="M8 12a4 4 0 0 1 8 0c0 2.4-.2 4.8-.7 7" />
+    <path d="M12 3a9 9 0 0 0-9 9c0 1.5-.1 3-.4 4.4" />
+    <path d="M5.5 20.5c1-2.3 1.5-4.9 1.5-7.5" />
+  </svg>
+);
+
+export const UploadIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5" />
+    <path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+  </svg>
+);
+
+export const MoonIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5Z" />
+  </svg>
+);
+
+export const SunIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" />
+  </svg>
+);
+
+export const MonitorSmallIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4.5" width="18" height="12" rx="1.5" />
+    <path d="M9 20h6M12 16.5V20" />
+  </svg>
+);
+
+export const TrashIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13" />
+  </svg>
+);
+
+export const BellActiveIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M6 9.5a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4s2-1.5 2-6.5Z" />
+    <path d="M10 19.5a2 2 0 0 0 4 0" />
+    <path d="M12 2.5v2" />
+  </svg>
+);
+
+export const ShieldCheckIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 2.8 4.5 6v6c0 4.6 3.1 8 7.5 9.2 4.4-1.2 7.5-4.6 7.5-9.2V6L12 2.8Z" />
+    <path d="m8.8 11.8 2.3 2.3 4.1-4.4" />
+  </svg>
+);
+
+export const PowerIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 3v9" />
+    <path d="M6.8 6.3a8 8 0 1 0 10.4 0" />
+  </svg>
+);

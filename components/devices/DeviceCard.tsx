@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
   GlobeIcon,
-  MonitorIcon,
+  LaptopIcon,
   SmartphoneIcon,
   TabletIcon,
 } from "@/components/ui/icons";
@@ -14,7 +14,7 @@ import {
 const KIND_ICON = {
   phone: SmartphoneIcon,
   tablet: TabletIcon,
-  desktop: MonitorIcon,
+  desktop: LaptopIcon,
   web: GlobeIcon,
 } as const;
 
@@ -49,11 +49,18 @@ export interface DeviceCardProps {
   /** Stable reference time captured by the screen on mount. */
   now: number;
   onApprove: (id: string) => void;
+  onReject: (id: string) => void;
   onRevokeRequest: (device: RegisteredDevice) => void;
 }
 
-/** One registered-device card with status, verification, and mock actions. */
-export function DeviceCard({ device, now, onApprove, onRevokeRequest }: DeviceCardProps) {
+/** One registered-device row in the design's list style. */
+export function DeviceCard({
+  device,
+  now,
+  onApprove,
+  onReject,
+  onRevokeRequest,
+}: DeviceCardProps) {
   const Icon = KIND_ICON[device.kind];
   const status = STATUS_BADGE[device.status];
   const verification = VERIFICATION_BADGE[device.verification];
@@ -75,50 +82,70 @@ export function DeviceCard({ device, now, onApprove, onRevokeRequest }: DeviceCa
     <StatusBadge tone={verification.tone}>{verification.label}</StatusBadge>
   );
 
+  const activityText =
+    device.lastActiveAt === null
+      ? device.status === "pending"
+        ? `Requested ${Math.max(1, Math.round((now - device.addedAt) / 60_000))} min ago`
+        : "Never active"
+      : lastActiveLabel(device.lastActiveAt, now);
+
   return (
     <li className={cardClasses}>
-      <div className={styles.deviceTop}>
-        <span className={styles.deviceIcon} aria-hidden>
-          <Icon size={22} />
+      <span className={styles.deviceIcon} aria-hidden>
+        <Icon size={22} />
+      </span>
+
+      <div className={styles.deviceInfo}>
+        <span className={styles.deviceNameRow}>
+          <span className={styles.deviceName}>{device.displayName}</span>
+          {device.isCurrentDevice ? (
+            <span className={styles.currentTag}>This device</span>
+          ) : null}
+          <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+          {verification.note ? (
+            <Tooltip text={verification.note}>{verificationBadge}</Tooltip>
+          ) : (
+            verificationBadge
+          )}
         </span>
-        <div className={styles.deviceInfo}>
-          <span className={styles.deviceNameRow}>
-            <span className={styles.deviceName}>{device.displayName}</span>
-            {device.isCurrentDevice ? (
-              <span className={styles.currentTag}>This device</span>
-            ) : null}
-          </span>
+        <span className={styles.deviceMeta}>
           <span className={styles.devicePlatform}>{device.platform}</span>
-          <span className={styles.deviceActive}>
-            {lastActiveLabel(device.lastActiveAt, now)}
+          <span className={styles.deviceSep} aria-hidden>
+            ·
           </span>
-        </div>
+          <span className={styles.deviceKind}>{deviceKindLabel(device.kind)}</span>
+          <span className={styles.deviceSep} aria-hidden>
+            ·
+          </span>
+          <span
+            className={
+              device.status === "pending"
+                ? `${styles.deviceActive} ${styles.deviceActivePending}`
+                : styles.deviceActive
+            }
+          >
+            {activityText}
+          </span>
+          <span className={styles.deviceSep} aria-hidden>
+            ·
+          </span>
+          <span className={styles.devicePaired}>paired {addedLabel}</span>
+        </span>
       </div>
-
-      <div className={styles.badgeRow}>
-        <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-        {verification.note ? (
-          <Tooltip text={verification.note}>{verificationBadge}</Tooltip>
-        ) : (
-          verificationBadge
-        )}
-      </div>
-
-      <dl className={styles.deviceMetaGrid}>
-        <dt className={styles.metaKey}>Type</dt>
-        <dd className={styles.metaValue}>{deviceKindLabel(device.kind)}</dd>
-        <dt className={styles.metaKey}>Paired</dt>
-        <dd className={styles.metaValue}>{addedLabel}</dd>
-      </dl>
 
       <div className={styles.deviceActions}>
         {device.status === "pending" ? (
-          <Button size="sm" onClick={() => onApprove(device.id)}>
-            Approve
-          </Button>
+          <>
+            <Button variant="ghost" size="sm" onClick={() => onReject(device.id)}>
+              Reject
+            </Button>
+            <Button size="sm" onClick={() => onApprove(device.id)}>
+              Approve
+            </Button>
+          </>
         ) : null}
         {device.status === "approved" && !device.isCurrentDevice ? (
-          <Button variant="danger" size="sm" onClick={() => onRevokeRequest(device)}>
+          <Button variant="secondary" size="sm" onClick={() => onRevokeRequest(device)}>
             Revoke
           </Button>
         ) : null}

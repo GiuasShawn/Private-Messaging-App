@@ -13,19 +13,27 @@ describe("device management (mock data)", () => {
     expect(screen.getByText("Kitchen iPad")).toBeInTheDocument();
     expect(screen.getByText("This device")).toBeInTheDocument();
 
-    expect(screen.getByText("Pending approval")).toBeInTheDocument();
+    // "Pending approval" appears in the stat strip and on the device badge.
+    expect(screen.getAllByText("Pending approval").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Approved").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Revoked")).toBeInTheDocument();
   });
 
   it("approves a pending device via the mock action", async () => {
     const user = userEvent.setup();
-    render(<DevicesScreen />);
+    const { container } = render(<DevicesScreen />);
 
-    expect(screen.getByText("Pending approval")).toBeInTheDocument();
+    expect(screen.getAllByText("Pending approval").length).toBeGreaterThanOrEqual(1);
     await user.click(screen.getByRole("button", { name: "Approve" }));
 
-    expect(screen.queryByText("Pending approval")).not.toBeInTheDocument();
+    // No pending badge remains on any device row…
+    expect(
+      container.querySelectorAll("[class*='deviceNameRow']"),
+    ).toHaveLength(5);
+    for (const row of container.querySelectorAll("[class*='deviceNameRow']")) {
+      expect(row.textContent).not.toContain("Pending approval");
+    }
+    // …and the stat strip now reports zero pending devices.
     expect(screen.getAllByText("Approved").length).toBeGreaterThanOrEqual(2);
   });
 

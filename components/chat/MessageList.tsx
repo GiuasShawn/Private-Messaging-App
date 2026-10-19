@@ -26,9 +26,11 @@ export interface MessageListProps {
 }
 
 /**
- * Scrollable message history. Handles the three required history states
- * (loading skeleton / inline error / empty) and keeps the view pinned to the
- * newest message. The list is a log landmark so new content is announced.
+ * Scrollable message history in the design's grouped-bubble style: runs of
+ * consecutive same-author messages tighten together and only the final
+ * bubble of a run shows the timestamp/receipt. Handles the three required
+ * history states (loading skeleton / inline error / empty) and keeps the
+ * view pinned to the newest message.
  */
 export function MessageList({
   messages,
@@ -101,15 +103,31 @@ export function MessageList({
       aria-live="polite"
       tabIndex={0}
     >
+      <p className={styles.protocolPill}>
+        <span className={styles.protocolDot} aria-hidden />
+        Simulated Double Ratchet session with {partner.displayName}. Messages
+        stay on this device.
+      </p>
       {messages.map((message, index) => {
         const previous = index > 0 ? messages[index - 1] : undefined;
+        const next = index < messages.length - 1 ? messages[index + 1] : undefined;
         const showSeparator = !previous || !isSameDay(previous.sentAt, message.sentAt);
+        const isFirstInGroup =
+          !previous ||
+          previous.author !== message.author ||
+          !isSameDay(previous.sentAt, message.sentAt);
+        const isLastInGroup =
+          !next || next.author !== message.author || !isSameDay(next.sentAt, message.sentAt);
         return (
           <div key={message.id}>
             {showSeparator ? (
               <DateSeparator label={formatDayLabel(message.sentAt, now)} />
             ) : null}
-            <MessageBubble message={message} partner={partner} />
+            <MessageBubble
+              message={message}
+              isFirstInGroup={isFirstInGroup}
+              isLastInGroup={isLastInGroup}
+            />
           </div>
         );
       })}
