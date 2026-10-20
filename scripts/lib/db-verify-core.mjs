@@ -193,25 +193,40 @@ async function checkPrimaryKey(client) {
 }
 
 async function checkForeignKey(client) {
+  // pg_catalog rather than information_schema: constraint_column_usage rows
+  // for a foreign key describe the REFERENCED columns, so their table_schema
+  // is the target schema (`auth` here), and the classic
+  // `ccu.table_schema = tc.table_schema` join silently matches nothing for
+  // cross-schema references. pg_constraint states the reference directly.
   const { rows } = await client.query(
-    `select rc.delete_rule, ccu.table_name as foreign_table, ccu.column_name as foreign_column
-     from information_schema.table_constraints tc
-     join information_schema.key_column_usage kcu
-       on kcu.constraint_name = tc.constraint_name
-      and kcu.table_schema = tc.table_schema
-     join information_schema.constraint_column_usage ccu
-       on ccu.constraint_name = tc.constraint_name
-      and ccu.table_schema = tc.table_schema
-     join information_schema.referential_constraints rc
-       on rc.constraint_name = tc.constraint_name
-      and rc.constraint_schema = tc.table_schema
-     where tc.table_schema = 'public' and tc.table_name = 'profiles'
-       and tc.constraint_type = 'FOREIGN KEY'`,
+    `select case c.confdeltype
+              when 'c' then 'CASCADE'
+              when 'r' then 'RESTRICT'
+              when 'n' then 'SET NULL'
+              when 'd' then 'SET DEFAULT'
+              when 'a' then 'NO ACTION'
+            end as delete_rule,
+            fn.nspname as foreign_schema,
+            frel.relname as foreign_table,
+            fcol.attname as foreign_column
+     from pg_constraint c
+     join pg_class crel on crel.oid = c.conrelid
+     join pg_namespace cns on cns.oid = crel.relnamespace
+     join pg_class frel on frel.oid = c.confrelid
+     join pg_namespace fn on fn.oid = frel.relnamespace
+     join pg_attribute fcol
+       on fcol.attrelid = c.confrelid
+      and fcol.attnum = c.confkey[1]
+     where c.contype = 'f'
+       and cns.nspname = 'public'
+       and crel.relname = 'profiles'`,
   );
   assert(rows.length === 1, `expected exactly one foreign key, got ${rows.length}`);
   assert(
-    rows[0].foreign_table === "users" && rows[0].foreign_column === "id",
-    `foreign key must reference auth.users(id), got ${rows[0].foreign_table}(${rows[0].foreign_column})`,
+    rows[0].foreign_schema === "auth" &&
+      rows[0].foreign_table === "users" &&
+      rows[0].foreign_column === "id",
+    `foreign key must reference auth.users(id), got ${rows[0].foreign_schema}.${rows[0].foreign_table}(${rows[0].foreign_column})`,
   );
   assert(
     rows[0].delete_rule === "CASCADE",
@@ -242,7 +257,7 @@ async function checkRowLevelSecurityEnabled(client) {
 
 async function checkPolicyInventory(client) {
   const { rows } = await client.query(
-    `select policyname, cmd, roles, with_check
+    `select policyname, cmd, roles::text[] as roles, with_check
      from pg_policies
      where schemaname = 'public' and tablename = 'profiles'
      order by policyname`,

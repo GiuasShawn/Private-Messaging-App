@@ -32,6 +32,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # LayoutProps/PageProps are generated globals (.next/types, gitignored);
+      # generate them explicitly so `tsc` works on a clean checkout instead of
+      # depending on leftover build artifacts.
+      - name: Generate Next.js route types
+        run: npx next typegen
       - name: Type-check
         run: npx tsc --noEmit
       - name: Lint
