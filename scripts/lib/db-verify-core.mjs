@@ -272,8 +272,10 @@ async function checkPolicyInventory(client) {
       `policy ${row.policyname} must target the authenticated role only, got [${(row.roles ?? []).join(", ")}]`,
     );
   }
-  const selectPolicy = rows.find((r) => r.cmd === "select");
-  const updatePolicy = rows.find((r) => r.cmd === "update");
+  // pg_policies.cmd is uppercase in modern PostgreSQL ('SELECT'/'UPDATE'),
+  // but was lowercase in older versions; compare case-insensitively.
+  const selectPolicy = rows.find((r) => String(r.cmd).toLowerCase() === "select");
+  const updatePolicy = rows.find((r) => String(r.cmd).toLowerCase() === "update");
   assert(selectPolicy, "missing the SELECT policy");
   assert(updatePolicy, "missing the UPDATE policy");
   assert(updatePolicy.with_check, "UPDATE policy must define WITH CHECK");
