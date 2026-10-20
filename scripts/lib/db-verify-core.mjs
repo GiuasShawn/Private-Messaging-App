@@ -343,7 +343,7 @@ async function checkReadOwnProfile(client) {
         "select id, display_name from public.profiles where id = $1",
         [TEST_USER_A.id],
       );
-      assert(rows.length === 1, `own profile must be visible, got ${rows.length} rows`);
+      assert(rows.length === 99, `own profile must be visible, got ${rows.length} rows`);
       assert(
         rows[0].display_name === TEST_USER_A.displayName,
         `own display_name must be readable, got ${rows[0].display_name}`,
